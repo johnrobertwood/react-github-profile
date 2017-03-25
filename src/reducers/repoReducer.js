@@ -2,10 +2,9 @@ import * as types from '../actions/actionTypes';
 
 export default function repoReducer(state = [], action) {
   switch(action.type) {
-    case types.FIND_REPO:
-      return [...state,
-        Object.assign({}, action.repo)
-      ];
+
+    case types.LOAD_REPOS_SUCCESS:
+      return action.repos;
 
     default:
       return state;

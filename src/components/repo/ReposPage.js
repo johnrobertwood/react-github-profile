@@ -2,6 +2,8 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as repoActions from '../../actions/repoActions';
+import RepoItem from './RepoItem.js';
+
 class ReposPage extends React.Component {
 
   constructor(props, context) {
@@ -15,26 +17,26 @@ class ReposPage extends React.Component {
   }
 
   handleChange(e) {
-    console.log(this.state.user)
-    const user = this.state.user;
+    const user = e.target.value;
     this.setState({user: user});
   }
 
   onClickSave() {
-    console.log('test')
-    console.log(this.state)
-    this.props.actions.setUser(this.state.user);
+    this.props.actions.fetchRepos(this.state.user);
   }
 
   userRow(user, index) {
     return <div key={index}>{user}</div>;
   }
 
+  repoRow(repo, index) {
+    return <RepoItem key={index} repo={repo}/>;
+  }
+
   render() {
     return (
       <div>
         <h1>Repos</h1>
-        {this.userRow}
         <h2>Find Repo</h2>
         <input
           type="text"
@@ -45,6 +47,8 @@ class ReposPage extends React.Component {
           type="submit"
           value="save"
           onClick={this.onClickSave} />
+
+        {this.props.repos.map(this.repoRow)}
       </div>
     );
   }

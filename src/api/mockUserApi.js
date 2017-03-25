@@ -16,7 +16,7 @@ const user = {
   hireable: true,
   bio: null,
   repos_url: "https://api.github.com/users/johnrobertwood/repos"
-}
+};
 
 class UserApi {
   static getUser() {
