@@ -1,16 +1,29 @@
 import 'babel-polyfill';
 import React from 'react';
 import { render } from 'react-dom';
-import configureStore from './store/configureStore';
+import { createStore, applyMiddleware } from 'redux';
+import rootReducer from './reducers';
 import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { fetchRepos } from './actions/repoActions';
 import routes from './routes';
+import reduxImmutableStateInvariant from 'redux-immutable-state-invariant';
+import thunk from 'redux-thunk';
 import './styles/styles.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import { loadState, saveState } from './localStorage';
 
-const store = configureStore();
-// store.dispatch(fetchRepos('johnrobertwood'));
+const persistedState = loadState();
+
+const store = createStore(
+  rootReducer, 
+  persistedState, 
+  applyMiddleware(thunk, reduxImmutableStateInvariant())
+);
+
+store.subscribe(() => {
+  saveState(store.getState());
+});
 
 render(
   <Provider store={store}>

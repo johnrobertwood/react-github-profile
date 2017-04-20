@@ -4,7 +4,7 @@ import delay from './delay';
 // It uses setTimeout to simulate the delay of an AJAX call.
 // All calls return promises.
 
-const user = {
+const users = {
   login: "johnrobertwood",
   id: 11791782,
   avatar_url: "https://avatars3.githubusercontent.com/u/11791782?v=3",
@@ -19,10 +19,10 @@ const user = {
 };
 
 class UserApi {
-  static getUser() {
+  static getUser(name) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve(Object.assign({}, user));
+        resolve(Object.assign({}, name));
       }, delay);
     });
   }

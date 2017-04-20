@@ -3,17 +3,19 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as repoActions from '../../actions/repoActions';
 import RepoItem from './RepoItem.js';
+// import mockUserApi from '../../api/mockUserApi';
 
 class ReposPage extends React.Component {
 
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      repo: { name: '' },
-      user: ''
-    };
+  constructor(props) {
+    super(props);
+    this.state = {user: ''};
     this.handleChange = this.handleChange.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
+  }
+
+  componentWillMount() {
+    this.setState({user: this.props.user});
   }
 
   handleChange(e) {
@@ -23,10 +25,8 @@ class ReposPage extends React.Component {
 
   onClickSave() {
     this.props.actions.fetchRepos(this.state.user);
-  }
-
-  userRow(user, index) {
-    return <div key={index}>{user}</div>;
+    this.props.actions.setUser(this.state.user);
+    // mockUserApi.getUser(this.state.user);
   }
 
   repoRow(repo, index) {
@@ -49,6 +49,7 @@ class ReposPage extends React.Component {
           onClick={this.onClickSave} />
 
         {this.props.repos.map(this.repoRow)}
+
       </div>
     );
   }
@@ -56,20 +57,37 @@ class ReposPage extends React.Component {
 
 ReposPage.propTypes = {
   repos: PropTypes.array.isRequired,
+  user: PropTypes.string.isRequired,
   actions: PropTypes.object.isRequired
 };
 
-function mapStateToProps(state, ownProps) {
-  return {
-    repos: state.repos,
-    user: state.user
-  };
-}
+const getDaysOld = (date) => {
+  let updateDate = new Date(date).getTime();
+  let now = Date.now();
+  let days = ((now - updateDate) / 86400000);
+  return days;
+};
 
-function mapDispatchToProps(dispatch) {
-  return {
+const getVisibleRepos = (repos, filter) => {
+  switch (filter) {
+    case 'SHOW_ALL':
+      return repos;
+    case 'LAST_MONTH':
+      return repos.filter(d => getDaysOld(d.created_at) < 30);
+    case 'LAST_YEAR':
+      return repos.filter(d => getDaysOld(d.created_at) < 365);
+    default:
+      throw new Error('Unknown filter: ' + filter);
+  }
+};
+
+const mapStateToProps = (state, ownProps) => ({
+    repos: getVisibleRepos(state.repos, state.visibilityFilter),
+    user: state.user
+});
+
+const mapDispatchToProps = (dispatch) => ({
     actions: bindActionCreators(repoActions, dispatch)
-  };
-}
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReposPage);
